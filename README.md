@@ -1,6 +1,6 @@
 # NGS Analysis of Multi-Drug Resistant E. coli
 ## Overview
-**This repository contains the Next-Generation Sequencing (NGS) data analysis workflow for multi-drug resistant Escherichia coli. The analysis follows a structured pipeline from raw data acquisition to quality control. More steps will be added as the analysis progresses**
+**This repository contains the Next-Generation Sequencing (NGS) data analysis workflow for _whole genome sequence_ (WGS) multi-drug resistant Escherichia coli. The analysis follows a structured pipeline from raw data acquisition to quality control. More steps will be added as the analysis progresses**
 
 ### Steps Completed So Far:
 #### System Preparation
