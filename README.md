@@ -74,7 +74,7 @@ This repository contains the Next-Generation Sequencing (NGS) data analysis work
 
 ---
 ## **Next Steps** 🚀
-1️⃣ **Antibiotic resistance gene identification** using CARD or AMRFinderPlus.  
+1️⃣ **Functional annotation with SnpEff and Antibiotic resistance gene identification** using CARD or AMRFinderPlus.  
 2️⃣ **Phylogenetic analysis** to determine strain relationships.  
 3️⃣ **Comparative genomics** to analyze mutations relative to other strains.  
 4️⃣ **Functional analysis of resistance genes**.  
