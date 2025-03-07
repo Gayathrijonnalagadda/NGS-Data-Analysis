@@ -71,21 +71,6 @@ This repository contains the Next-Generation Sequencing (NGS) data analysis work
   ```bash
   freebayes -f reference.fasta mapped_reads_sorted.bam > variants.vcf
   ```
-- Alternatively, used **GATK HaplotypeCaller**:
-  ```bash
-  gatk HaplotypeCaller -R reference.fasta -I mapped_reads_sorted.bam -O variants.vcf
-  ```
-- Filtered variants using **bcftools**:
-  ```bash
-  bcftools filter -i 'QUAL>30 && DP>10' variants.vcf > filtered_variants.vcf
-  ```
-
-### **8️⃣ Functional Annotation**
-- Used **SnpEff** to annotate variants:
-  ```bash
-  snpEff annotate reference.fasta filtered_variants.vcf > annotated_variants.vcf
-  ```
-- Compared results with the **Comprehensive Antibiotic Resistance Database (CARD)**.
 
 ---
 ## **Next Steps** 🚀
