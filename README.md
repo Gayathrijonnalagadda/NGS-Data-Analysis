@@ -1,46 +1,98 @@
-# NGS Analysis of Multi-Drug Resistant E. coli
+
+# NGS Analysis of Multi-Drug Resistant *E. coli*
+
 ## Overview
-**This repository contains the Next-Generation Sequencing (NGS) data analysis workflow for _whole genome sequence_ (WGS) multi-drug resistant Escherichia coli. The analysis follows a structured pipeline from raw data acquisition to quality control. More steps will be added as the analysis progresses**
+This repository contains the Next-Generation Sequencing (NGS) data analysis workflow for whole genome sequencing (WGS) of multi-drug resistant *Escherichia coli*. The analysis follows a structured pipeline from raw data acquisition to quality control, genome assembly, read mapping, and variant calling. More steps will be added as the analysis progresses.
 
-### Steps Completed So Far:
-#### System Preparation
-Updated Linux system using:
-```
-sudo apt update && sudo apt upgrade -y
-```
-**Resolved dependencies and ensured proper package installations**
-#### Installing OpenJDK (for bioinformatics tools compatibility)
-Installed OpenJDK using:
-```
-sudo apt install openjdk-11-jdk -y
-```
-#### Downloading Whole Genome Reads
-Retrieved sequencing data for multi-drug resistant E. coli from public repositories.
-* Used SRA Toolkit to download raw reads:
-```
-prefetch SRR31548417
-```
-* Converted .sra format to FASTQ files:
-```
-fastq-dump --split-files SRR31548417
-```
-#### Quality Control (QC)
-Performed FastQC analysis to check read quality:
-```
-mkdir qc_reports
-fastqc SRR31548417_1.fastq.gz SRR31548417_2.fastq.gz -o qc_reports/
-```
-Stored all quality reports in qc_reports/ directory.
+---
+## Steps Completed So Far
 
-### Next Steps
-1 Adapter trimming and quality filtering using Trimmomatic.
+### **1️⃣ System Preparation**
+- Updated Linux system:
+  ```bash
+  sudo apt update && sudo apt upgrade -y
+  ```
+- Installed dependencies and ensured proper package installations.
+- Installed OpenJDK (required for bioinformatics tools compatibility):
+  ```bash
+  sudo apt install openjdk-11-jdk -y
+  ```
 
-2 Genome assembly using SPAdes.
+### **2️⃣ Downloading Whole Genome Reads**
+- Retrieved sequencing data for multi-drug resistant *E. coli* from public repositories.
+- Used **SRA Toolkit** to download raw reads:
+  ```bash
+  prefetch SRR31548417
+  ```
+- Converted `.sra` format to FASTQ files:
+  ```bash
+  fastq-dump --split-files SRR31548417
+  ```
 
-3 Read mapping to a reference genome.
+### **3️⃣ Quality Control (QC)**
+- Performed **FastQC** analysis to check read quality:
+  ```bash
+  mkdir qc_reports
+  fastqc SRR31548417_1.fastq.gz SRR31548417_2.fastq.gz -o qc_reports/
+  ```
+- Stored all quality reports in the `qc_reports/` directory.
 
-4 Variant calling and functional annotation.
+### **4️⃣ Genome Assembly Using SPAdes**
+- Used **SPAdes** to assemble the genome from paired-end reads:
+  ```bash
+  spades.py -1 SRR31548417_1.fastq.gz -2 SRR31548417_2.fastq.gz -o spades_output
+  ```
+- Verified output and checked for `scaffolds.fasta`.
 
-5 Antibiotic resistance gene identification.
+### **5️⃣ Reference Genome Preparation**
+- Downloaded the reference genome from NCBI (in `ncbi_dataset.zip`).
+- Extracted and indexed the reference genome:
+  ```bash
+  unzip ncbi_dataset.zip -d ncbi_reference
+  cp ncbi_reference/ncbi_dataset/data/*/genomic.fna reference.fasta
+  bwa index reference.fasta
+  samtools faidx reference.fasta
+  ```
 
-This README will be updated as more steps are completed. Stay tuned! 🚀
+### **6️⃣ Read Mapping to Reference Genome**
+- Mapped reads to the reference genome using **BWA-MEM**:
+  ```bash
+  bwa mem -t 8 reference.fasta SRR31548417_1.fastq.gz SRR31548417_2.fastq.gz > mapped_reads.sam
+  ```
+- Converted, sorted, and indexed the BAM file:
+  ```bash
+  samtools view -Sb mapped_reads.sam > mapped_reads.bam
+  samtools sort mapped_reads.bam -o mapped_reads_sorted.bam
+  samtools index mapped_reads_sorted.bam
+  ```
+
+### **7️⃣ Variant Calling**
+- Used **FreeBayes** for variant calling:
+  ```bash
+  freebayes -f reference.fasta mapped_reads_sorted.bam > variants.vcf
+  ```
+- Alternatively, used **GATK HaplotypeCaller**:
+  ```bash
+  gatk HaplotypeCaller -R reference.fasta -I mapped_reads_sorted.bam -O variants.vcf
+  ```
+- Filtered variants using **bcftools**:
+  ```bash
+  bcftools filter -i 'QUAL>30 && DP>10' variants.vcf > filtered_variants.vcf
+  ```
+
+### **8️⃣ Functional Annotation**
+- Used **SnpEff** to annotate variants:
+  ```bash
+  snpEff annotate reference.fasta filtered_variants.vcf > annotated_variants.vcf
+  ```
+- Compared results with the **Comprehensive Antibiotic Resistance Database (CARD)**.
+
+---
+## **Next Steps** 🚀
+1️⃣ **Antibiotic resistance gene identification** using CARD or AMRFinderPlus.  
+2️⃣ **Phylogenetic analysis** to determine strain relationships.  
+3️⃣ **Comparative genomics** to analyze mutations relative to other strains.  
+4️⃣ **Functional analysis of resistance genes**.  
+
+This README will be updated as more steps are completed. Stay tuned! 🎯
+
